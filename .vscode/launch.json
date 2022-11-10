@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "remote launch",
+      "type": "lldb",
+      "request": "custom",
+      "targetCreateCommands": [
+        "target create ${workspaceFolder}/kernel/kernel.elf"
+      ],
+      "processCreateCommands": ["gdb-remote localhost:1234"]
+    }
+  ]
+}
