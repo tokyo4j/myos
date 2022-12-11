@@ -7,7 +7,7 @@ static run freelist;
 
 void free_page(void* va)
 {
-    freelist.push((run_node*)va);
+    freelist.push((RunNode*)va);
 }
 
 void free_pages(void* va_start, void* va_end)

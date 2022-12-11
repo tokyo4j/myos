@@ -19,19 +19,20 @@ void zeromem(void* dst, int n);
 
 #define KERNEL_BASE 0xc0000000
 
-#define P2V(pa) ((u8*)(pa) + KERNEL_BASE)
+#define P2V(pa) (void*)((u8*)(pa) + KERNEL_BASE)
+#define V2P(pa) (void*)((u8*)(pa)-KERNEL_BASE)
 #define PGDOWN(a) ((void*)((u32)a & ~(u32)0xfff))
 #define PGUP(a) ((u8*)PGDOWN(a) + PGSIZE)
 
-struct run_node {
-    run_node* next;
+struct RunNode {
+    RunNode* next;
 };
 
 class run {
 private:
-    run_node* head;
+    RunNode* head;
 
 public:
-    void push(run_node* new_node);
-    run_node* pop();
+    void push(RunNode* new_node);
+    RunNode* pop();
 };

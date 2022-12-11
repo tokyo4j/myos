@@ -1,15 +1,14 @@
 #include <kmalloc.hpp>
 #include <page_alloc.hpp>
-#include <screen.hpp>
 
-static slob_header base;
-static slob_header* freep = nullptr;
+static SLOBHeader base;
+static SLOBHeader* freep;
 
 void kfree(void* ap)
 {
-    slob_header *bp, *p;
+    SLOBHeader *bp, *p;
 
-    bp = (slob_header*)ap - 1;
+    bp = (SLOBHeader*)ap - 1;
     for (p = freep; !(bp > p && bp < p->ptr); p = p->ptr)
         if (p >= p->ptr && (bp > p || bp < p->ptr))
             break;
@@ -26,11 +25,11 @@ void kfree(void* ap)
     freep = p;
 }
 
-static slob_header* morecore(u32 nu)
+static SLOBHeader* morecore()
 {
-    slob_header* hp;
+    SLOBHeader* hp;
 
-    hp = (slob_header*)alloc_page();
+    hp = (SLOBHeader*)alloc_page();
     hp->size = PGSIZE;
     kfree((void*)(hp + 1));
     return freep;
@@ -38,10 +37,10 @@ static slob_header* morecore(u32 nu)
 
 void* kmalloc(u32 nbytes)
 {
-    slob_header *p, *prevp;
+    SLOBHeader *p, *prevp;
     u32 nunits;
 
-    nunits = (nbytes + sizeof(slob_header) - 1) / sizeof(slob_header) + 1;
+    nunits = (nbytes + sizeof(SLOBHeader) - 1) / sizeof(SLOBHeader) + 1;
     if ((prevp = freep) == 0) {
         base.ptr = freep = prevp = &base;
         base.size = 0;
@@ -59,6 +58,6 @@ void* kmalloc(u32 nbytes)
             return (void*)(p + 1);
         }
         if (p == freep)
-            p = morecore(nunits);
+            p = morecore();
     }
 }

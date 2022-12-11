@@ -1,45 +1,64 @@
 OUTPUT_ARCH(i386)
-ENTRY(kmain)
+__KERNEL_OFFSET = 0xc0000000;
 
 SECTIONS
 {
-    . = 0xc0100000;
-    .text ALIGN(0x1000) : {
-        *(.text.entry)
-		*(.text*)
-        *(.gnu.linkonce.t*)
-	}
+    . = 1M;
 
-	.rodata ALIGN(0x1000) : {
-        start_ctors = .;
-        /* *(SORT(.ctors*)) */
-        end_ctors = .;
-
-		start_dtors = .;
-        /* *(SORT(.dtors*)) */
-        end_dtors = .;
-
-		*(.rodata*)
-		*(.gnu.linkonce.r.*)
-	}
-
-	.data ALIGN(0x1000) : {
-		*(.data)
-        *(.gnu.linkonce.d*)
-	}
-
-	.bss ALIGN(0x1000) : {
-        start_bss = .;
-		*(.bss)
-        *(.gnu.linkonce.b*)
-        end_bss = .;
-	}
-
-    /DISCARD/ :
-    {
-        *(.comment)
-        *(.eh_frame)
+    .multiboot : {
+        KEEP(*(.multiboot))
     }
 
-    end_kernel = .;
+    .text.boot : {
+        *(.text.boot)
+    }
+
+    .data.boot : {
+        *(.data.boot)
+    }
+
+    . += __KERNEL_OFFSET;
+
+    .text ALIGN(4K) : AT (ADDR(.text) - __KERNEL_OFFSET) {
+		*(.text*)
+	}
+
+	.rodata ALIGN(4K) : AT (ADDR(.rodata) - __KERNEL_OFFSET) {
+        __START_CTORS = .;
+        *(.ctors*)
+        __END_CTORS = .;
+
+		*(.rodata*)
+        /* __debug_info_start = .;
+        KEEP(*(.debug_info))
+        __debug_info_end = .;
+        __debug_abbrev_start = .;
+        KEEP(*(.debug_abbrev))
+        __debug_abbrev_end = .;
+        __debug_str_start = .;
+        KEEP(*(.debug_str))
+        __debug_str_end = .;
+        __debug_line_start = .;
+        KEEP(*(.debug_line))
+        __debug_line_end = .;
+        __debug_ranges_start = .;
+        KEEP(*(.debug_ranges))
+        __debug_ranges_end = .; */
+	}
+
+	.data ALIGN(4K) : AT (ADDR(.data) - __KERNEL_OFFSET) {
+		*(.data*)
+	}
+
+	.bss ALIGN(4K) : AT (ADDR(.bss) - __KERNEL_OFFSET) {
+		*(.bss*)
+	}
+
+    .bss.stack ALIGN(4K) : AT (ADDR(.bss.stack) - __KERNEL_OFFSET) {
+		__KSTACK_START = . - __KERNEL_OFFSET;
+        . += 4K;
+		__KSTACK_END = . - __KERNEL_OFFSET;
+	}
+
+    __KERNEL_END = . - __KERNEL_OFFSET;
 }

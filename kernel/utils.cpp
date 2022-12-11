@@ -7,15 +7,15 @@ void zeromem(void* dst, int n)
         ((u8*)dst)[i] = 0;
 }
 
-void run::push(run_node* new_node)
+void run::push(RunNode* new_node)
 {
     new_node->next = head;
     head = new_node;
 }
 
-run_node* run::pop()
+RunNode* run::pop()
 {
-    run_node* old_head = head;
+    RunNode* old_head = head;
     head = head->next;
     return old_head;
 }

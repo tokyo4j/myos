@@ -28,7 +28,6 @@ isr_common:
     iret
 
 %macro isr_stub_err 1
-global isr_stub_%1
 isr_stub_%1:
     cli
     push %1
@@ -36,15 +35,12 @@ isr_stub_%1:
 %endmacro
 
 %macro isr_stub_noerr 1
-global isr_stub_%1
 isr_stub_%1:
     cli
     push 0
     push %1
     jmp isr_common
 %endmacro
-
-;these defines isr_stub_[0~47] globally
 
 ;exceptions by CPU
 isr_stub_noerr 0
@@ -97,3 +93,55 @@ isr_stub_noerr 44 ;irq 12
 isr_stub_noerr 45 ;irq 13
 isr_stub_noerr 46 ;irq 14
 isr_stub_noerr 47 ;irq 15
+
+section .data
+global isr_stubs
+isr_stubs:
+    dd isr_stub_0
+    dd isr_stub_1
+    dd isr_stub_2
+    dd isr_stub_3
+    dd isr_stub_4
+    dd isr_stub_5
+    dd isr_stub_6
+    dd isr_stub_7
+    dd isr_stub_8
+    dd isr_stub_9
+    dd isr_stub_10
+    dd isr_stub_11
+    dd isr_stub_12
+    dd isr_stub_13
+    dd isr_stub_14
+    dd isr_stub_15
+    dd isr_stub_16
+    dd isr_stub_17
+    dd isr_stub_18
+    dd isr_stub_19
+    dd isr_stub_20
+    dd isr_stub_21
+    dd isr_stub_22
+    dd isr_stub_23
+    dd isr_stub_24
+    dd isr_stub_25
+    dd isr_stub_26
+    dd isr_stub_27
+    dd isr_stub_28
+    dd isr_stub_29
+    dd isr_stub_30
+    dd isr_stub_31
+    dd isr_stub_32
+    dd isr_stub_33
+    dd isr_stub_34
+    dd isr_stub_35
+    dd isr_stub_36
+    dd isr_stub_37
+    dd isr_stub_38
+    dd isr_stub_39
+    dd isr_stub_40
+    dd isr_stub_41
+    dd isr_stub_42
+    dd isr_stub_43
+    dd isr_stub_44
+    dd isr_stub_45
+    dd isr_stub_46
+    dd isr_stub_47

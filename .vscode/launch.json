@@ -2,13 +2,23 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "remote launch",
-      "type": "lldb",
-      "request": "custom",
-      "targetCreateCommands": [
-        "target create ${workspaceFolder}/kernel/kernel.elf"
-      ],
-      "processCreateCommands": ["gdb-remote localhost:1234"]
+      "name": "(gdb) Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/.vscode/dummy.txt",
+      "MIMode": "gdb",
+      "targetArchitecture": "x86",
+      "cwd": "${fileDirname}",
+      "customLaunchSetupCommands": [
+        {
+          "text": "file ${workspaceFolder}/kernel.elf",
+          "description": "load binary"
+        },
+        {
+          "description": "Connect to QEMU's GDB server",
+          "text": "target remote localhost:1234"
+        }
+      ]
     }
   ]
 }

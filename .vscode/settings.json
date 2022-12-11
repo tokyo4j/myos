@@ -1,0 +1,12 @@
+{
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "clangd.fallbackFlags": [
+    "-I${workspaceFolder}/include",
+    "-nostdinc",
+    "-nostdlib",
+    "-ffreestanding",
+    "-m32",
+    "-std=c++17",
+    "-Wno-c99-designator"
+  ]
+}
