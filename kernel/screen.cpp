@@ -1,3 +1,4 @@
+#include <constants.hpp>
 #include <int.hpp>
 #include <screen.hpp>
 #include <string.hpp>
@@ -8,7 +9,7 @@
 
 #define VT_MROWS 25 // row count
 #define VT_MCOLS 80 // column count
-#define VT_BASE 0xb8000 // base address of text cells
+#define VT_BASE P2V(0xb8000) // base address of text cells
 #define VT_CELLS ((u16*)VT_BASE) // for ease of accessing cells as array
 #define VT_WHITE_ON_BLACK 0x0f00 // foreground: white, background: black
 

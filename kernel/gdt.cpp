@@ -1,4 +1,5 @@
 #include "x86.hpp"
+#include <constants.hpp>
 #include <gdt.hpp>
 
 static GDTEntry gdt[3] = {
@@ -26,12 +27,12 @@ static GDTEntry gdt[3] = {
 
 static GDTR gdtr = {
     .size = sizeof(gdt) - 1,
-    .addr = (u32)V2P(&gdt),
+    .addr = (u32)(&gdt),
 };
 
 void init_gdt()
 {
-    asm volatile("lgdt (%%eax)" ::"r"(&gdtr));
+    asm volatile("lgdt (%0)" ::"r"(&gdtr));
     asm volatile("movw $0x10, %%ax\n\t"
                  "movw %%ax, %%ds\n\t"
                  "movw %%ax, %%es\n\t"

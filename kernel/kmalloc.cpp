@@ -30,7 +30,7 @@ static SLOBHeader* morecore()
     SLOBHeader* hp;
 
     hp = (SLOBHeader*)alloc_page();
-    hp->size = PGSIZE;
+    hp->size = PGSIZE / sizeof(SLOBHeader);
     kfree((void*)(hp + 1));
     return freep;
 }
@@ -60,4 +60,24 @@ void* kmalloc(u32 nbytes)
         if (p == freep)
             p = morecore();
     }
+}
+
+void* operator new(size_t size)
+{
+    return kmalloc(size);
+}
+
+void* operator new[](size_t size)
+{
+    return kmalloc(size);
+}
+
+void operator delete(void* p) noexcept
+{
+    kfree(p);
+}
+
+void operator delete[](void* p) noexcept
+{
+    kfree(p);
 }

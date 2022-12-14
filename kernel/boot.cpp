@@ -1,31 +1,49 @@
+#include <constants.hpp>
 #include <int.hpp>
-#include <linked_values.hpp>
 
-extern "C" void _start() __attribute__((section(".text.boot"))) __attribute__((naked));
+static u32 early_pgdir[1024] __attribute__((section(".data.boot"), aligned(4096)));
 
-u32 early_pgdir[1024] __attribute__((section(".data.boot"))) __attribute__((aligned(4096))) = {
-    [0] = 0b1000'0011,
-    [0xc0000000 >> 22] = 0b1000'0011,
-};
+static u32 eax __attribute__((section(".data.boot")));
+static u32 ebx __attribute__((section(".data.boot")));
 
-u32 eax __attribute__((section(".data.boot")));
-u32 ebx __attribute__((section(".data.boot")));
+extern "C" void kmain(void* mb2_structure_ptr);
 
-extern "C" void kmain();
+static void jmp_to_kmain()
+{
+    early_pgdir[0] = 0;
+    asm volatile("invlpg (%0)" ::"r"(0));
 
-void _start()
+    // u32 x = ebx;
+
+    kmain(*(void**)(P2V(&ebx)));
+}
+
+extern "C" void __attribute__((section(".text.boot"))) _start()
 {
     asm volatile(""
                  : "=a"(eax));
     asm volatile(""
                  : "=b"(ebx));
+    if (eax != 0x36d76289)
+        asm volatile("hlt");
+
+    if (KERNEL_OFFSET != (u32)&__KERNEL_OFFSET)
+        asm volatile("hlt");
+
+    early_pgdir[0] = 0b1000'0011;
+    for (u32 i = KERNEL_OFFSET >> PGDIR_SHIFT; i < 0x1'0000'0000 >> PGDIR_SHIFT; i++) {
+        u32 frame_index = i - (KERNEL_OFFSET >> PGDIR_SHIFT);
+        early_pgdir[i] = (frame_index << PGDIR_SHIFT) | 0b1000'0011;
+    }
 
     // enable PSE
     asm volatile(
         "movl %%cr4, %%eax\n\t"
         "orl $0x00000010, %%eax\n\t"
-        "movl %%eax, %%cr4\n\t" ::
-            : "eax");
+        "movl %%eax, %%cr4\n\t"
+        :
+        :
+        : "eax");
 
     // set page directory
     asm volatile(
@@ -37,14 +55,18 @@ void _start()
     asm volatile(
         "movl %%cr0, %%eax\n\t"
         "orl $0x80000000, %%eax\n\t"
-        "movl %%eax, %%cr0\n\t" ::
-            : "eax");
+        "movl %%eax, %%cr0\n\t"
+        :
+        :
+        : "eax");
 
+    // initialize esp & ebp
     asm volatile(
         "movl %0, %%esp\n\t"
-        "addl $0xc0000000, %%esp\n\t"
         "subl $32, %%esp\n\t"
-        "movl %%esp, %%ebp\n\t" ::"r"(&__KSTACK_END));
+        "movl %%esp, %%ebp\n\t"
+        :
+        : "r"(P2V(&__KSTACK_END)));
 
-    asm volatile("call kmain");
+    jmp_to_kmain();
 }

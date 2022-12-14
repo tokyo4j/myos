@@ -8,20 +8,6 @@ HEADERS = $(wildcard include/*.h) $(wildcard include/*.hpp)
 # 	-drive filos.iso,index=0,if=ide,format=raw \
 # 	-drive file=os.iso,index=0,if=floppy,format=raw
 
-# gcc
-# CXX = i386-elf-g++
-# LD = i386-elf-ld
-# DBG = i386-elf-gdb
-# DBGOPTS = \
-# 	-ex "target remote localhost:1234"
-
-#clang
-CXX = clang++ -target i386
-LD = ld.lld
-DBG = lldb
-DBGOPTS = \
-	-o "gdb-remote localhost:1234"
-
 CXXFLAGS = \
 	-g \
 	-O0 \
@@ -30,11 +16,19 @@ CXXFLAGS = \
 	-ffreestanding \
 	-Wall \
 	-Wextra \
-	-Wno-c99-designator \
 	-fno-exceptions \
 	-fno-rtti \
-	-fno-use-init-array \
 	-std=gnu++20
+
+# gcc
+# CXX = i386-elf-g++
+# LD = i386-elf-ld
+# CXXFLAGS += -Wno-sized-deallocation
+
+#clang
+CXX = clang++
+CXXFLAGS += -target i386 -fno-use-init-array -Wno-c99-designator
+LD = ld.lld
 
 .PHONY: all run debug bdebug clean bochs
 
@@ -72,7 +66,7 @@ debug: os.iso kernel/kernel.elf
 	$(QEMU) -s -S $(QEMUOPTS)
 
 clean:
-	rm -f */*.bin */*.o */*.elf os.iso
+	rm -f */*.bin */*.o */*.elf os.iso *.elf
 
 hoge:
 	objdump -b binary -m i386 -M intel -D kernel/kernel.binos.iso:

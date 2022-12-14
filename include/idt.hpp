@@ -2,11 +2,6 @@
 #include <int.hpp>
 
 #define IDT_ENTRY_COUNT 48
-#define IDT_GATE_INT_32 0xe
-#define IDT_GATE_TRAP_32 0xf
-#define IDT_RING_0 0
-#define IDT_RING_3 (3 << 4)
-#define IDT_PRESENT (1 << 7)
 
 struct IDTEntry {
     u16 base_lo;

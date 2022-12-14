@@ -34,6 +34,22 @@ static inline void outw(u16 port, u16 data)
                  : "a"(data), "d"(port));
 }
 
+static inline u32 inl(u16 port)
+{
+    u32 result;
+    asm volatile("inl %%dx, %%eax"
+                 : "=a"(result)
+                 : "d"(port));
+    return result;
+}
+
+static inline void outl(u16 port, u32 data)
+{
+    asm volatile("outl %%eax, %%dx"
+                 :
+                 : "a"(data), "d"(port));
+}
+
 static inline void insl(u16 port, void* addr, u32 cnt)
 {
     asm volatile("cld; rep; insl"

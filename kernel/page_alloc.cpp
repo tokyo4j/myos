@@ -3,7 +3,30 @@
 #include <screen.hpp>
 #include <utils.hpp>
 
-static run freelist;
+struct RunNode {
+    RunNode* next;
+};
+
+class Run {
+private:
+    RunNode* head;
+
+public:
+    void push(RunNode* new_node)
+    {
+        new_node->next = head;
+        head = new_node;
+    }
+
+    RunNode* pop()
+    {
+        RunNode* old_head = head;
+        head = head->next;
+        return old_head;
+    }
+};
+
+static Run freelist;
 
 void free_page(void* va)
 {

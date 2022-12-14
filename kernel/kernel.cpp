@@ -1,10 +1,11 @@
+#include <constants.hpp>
 #include <gdt.hpp>
 #include <idt.hpp>
 #include <int.hpp>
 #include <keyboard.hpp>
 #include <kmalloc.hpp>
-#include <linked_values.hpp>
 #include <page_alloc.hpp>
+#include <pci.hpp>
 #include <pic.hpp>
 #include <pit.hpp>
 #include <screen.hpp>
@@ -20,38 +21,40 @@ static void init_static_objs()
 
 const char* str = "hello, world";
 
-class C {
-public:
-    int x, y;
-    C(int x, int y)
+struct C {
+    const char *x, *y;
+    C(const char* x, const char* y)
         : x(x)
         , y(y)
     {
     }
 };
+C c("hello", "world");
 
-C c(123, 234);
-
-extern "C" void kmain()
+extern "C" void kmain(void* mb2_structure_ptr)
 {
     // call static object constructors
     init_static_objs();
 
     clear_screen();
     set_cursor(0);
-    kprintf("Hello, world!\n");
+    kprintf("%s, %s\n", c.x, c.y);
 
-    kprintf("%d %d\n", c.x, c.y);
-
-    // mark memory region mapped by early page directory as free
-    free_pages(P2V(PGUP(&__KERNEL_END)), P2V(0x400000));
+    free_pages(P2V(PGUP(&__KERNEL_END)), P2V(0x4000000));
 
     init_gdt();
     init_idt();
     init_pic();
     init_keyboard();
     init_pit();
+    init_pci();
 
+    kprintf("%08x\n", u32(new int));
+    kprintf("%08x\n", u32(new int));
+    kprintf("%08x\n", u32(new int));
+    kprintf("%08x\n", u32(new int));
+
+    // asm("hlt");
     asm("sti");
 
     while (1)
