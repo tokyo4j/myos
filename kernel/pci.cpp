@@ -40,12 +40,21 @@ static void scan_pci()
                 int status = try_read_pci_conf(bus, slot, func, &buf);
                 if (status == 0)
                     break;
-
-                kprintf("vendor id: %04x, ", buf.c.vendor_id);
-                kprintf("device id: %04x, ", buf.c.device_id);
+                kprintf("%02x.%x.%x ", bus, slot, func);
+                kprintf("ven id: %04x, ", buf.c.vendor_id);
+                kprintf("dev id: %04x, ", buf.c.device_id);
                 kprintf("class: %02x, ", buf.c.class_code);
                 kprintf("subclass: %02x, ", buf.c.subclass);
                 kprintf("header type: %02x\n", buf.c.header_type);
+
+                if((buf.c.header_type & 0x7f) == 0 && buf.c.vendor_id == 0x8086 && buf.c.device_id == 0x100e){
+                    kprintf("BAR[0]:%08x\n", buf.u.type1.bar[0]);
+                    kprintf("BAR[1]:%08x\n", buf.u.type1.bar[1]);
+                    kprintf("BAR[2]:%08x\n", buf.u.type1.bar[2]);
+                    kprintf("BAR[3]:%08x\n", buf.u.type1.bar[3]);
+                    kprintf("BAR[4]:%08x\n", buf.u.type1.bar[4]);
+                    kprintf("BAR[5]:%08x\n", buf.u.type1.bar[5]);
+                }
 
                 if (!(buf.c.header_type & 0x80))
                     break;

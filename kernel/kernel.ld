@@ -56,10 +56,10 @@ SECTIONS
 	}
 
     .bss.stack ALIGN(4K) : AT (ADDR(.bss.stack) - __KERNEL_OFFSET) {
-		__KSTACK_START = . - __KERNEL_OFFSET;
+		__KSTACK_START = .;
         . += 4K;
-		__KSTACK_END = . - __KERNEL_OFFSET;
+		__KSTACK_END = .;
 	}
 
-    __KERNEL_END = . - __KERNEL_OFFSET;
+    __KERNEL_END = .;
 }

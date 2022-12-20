@@ -13,8 +13,6 @@ static void jmp_to_kmain()
     early_pgdir[0] = 0;
     asm volatile("invlpg (%0)" ::"r"(0));
 
-    // u32 x = ebx;
-
     kmain(*(void**)(P2V(&ebx)));
 }
 
@@ -66,7 +64,7 @@ extern "C" void __attribute__((section(".text.boot"))) _start()
         "subl $32, %%esp\n\t"
         "movl %%esp, %%ebp\n\t"
         :
-        : "r"(P2V(&__KSTACK_END)));
+        : "r"(&__KSTACK_END));
 
     jmp_to_kmain();
 }

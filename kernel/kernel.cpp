@@ -40,7 +40,7 @@ extern "C" void kmain(void* mb2_structure_ptr)
     set_cursor(0);
     kprintf("%s, %s\n", c.x, c.y);
 
-    free_pages(P2V(PGUP(&__KERNEL_END)), P2V(0x4000000));
+    free_pages(PGUP(&__KERNEL_END), P2V(0x4000000));
 
     init_gdt();
     init_idt();
@@ -54,7 +54,7 @@ extern "C" void kmain(void* mb2_structure_ptr)
     kprintf("%08x\n", u32(new int));
     kprintf("%08x\n", u32(new int));
 
-    // asm("hlt");
+    asm("hlt");
     asm("sti");
 
     while (1)

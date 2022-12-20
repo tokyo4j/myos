@@ -38,9 +38,21 @@ qemu: os.iso
 	qemu-system-i386 -drive format=raw,file=$^
 
 qemud: os.iso
-	qemu-system-i386 -drive format=raw,file=$^ -s -S 
+	qemu-system-i386 -drive format=raw,file=$^ -s -S
 #	lldb kernel.elf --one-liner "gdb-remote localhost:1234"
 #	gdb kernel.elf -ex "target remote localhost:1234"
+
+VM_FOLDER = ./vm
+VM_NAME = MYOS
+IDE_CONTROLLER_NAME = "SATA Controller"
+vm: os.iso
+	mkdir -p $(VM_FOLDER)
+	VBoxManage createvm --name $(VM_NAME) --ostype Ubuntu20_LTS_64 --basefolder $(VM_FOLDER) --register
+	VBoxManage modifyvm $(VM_NAME) --cpus 2 --memory 2048 --vram 12 --graphicscontroller vmsvga
+	VBoxManage storagectl $(VM_NAME) --name $(IDE_CONTROLLER_NAME) --add ide
+	VBoxManage storageattach $(VM_NAME) --storagectl $(IDE_CONTROLLER_NAME) --port 0  --device 0 --type dvddrive --medium os.iso
+vbox:
+	VBoxManage startvm $(VM_NAME)
 
 os.iso: kernel.elf grubroot/boot/grub/grub.cfg
 	cp kernel.elf grubroot/boot/
@@ -67,6 +79,9 @@ debug: os.iso kernel/kernel.elf
 
 clean:
 	rm -f */*.bin */*.o */*.elf os.iso *.elf
+
+	-VBoxManage unregistervm --delete $(VM_NAME)
+	rm -rf $(VM_FOLDER)
 
 hoge:
 	objdump -b binary -m i386 -M intel -D kernel/kernel.binos.iso:
